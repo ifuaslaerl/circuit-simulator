@@ -1,55 +1,24 @@
-import typing
-import abc
 import numpy as np
-import pandas as pd
 
-class Componente:
+from src.circuit import Circuit
+import src.component as Component
 
-    @abc.abstractmethod
-    def corrente(self, s: complex) -> complex:
-        pass
+if __name__ == "__main__":
 
-    @abc.abstractmethod
-    def estampa(self, matriz: np.ndarray) -> None:
-        pass
+    circuit = Circuit()
 
-class Resistor(Componente):
+    components = [
+        Component.Resistor('a', 'b', 1),
+        Component.CurrentFont('a', 'c', 10),
+        Component.Transconductor('c', 'b', 'a', 'b', 3),
+        Component.Resistor('b', 'c', 2)
+    ]
 
-    def __init__(self, positivo: int, negativo: int, resistencia: float):
-        self.positivo: int = positivo
-        self.negativo: int = negativo
-        self.resistencia: float = resistencia
+    for component in components:
+        circuit.add_component(component)
 
-    def corrente(self, s: complex) -> complex:
-        return s/self.resistencia
+    # circuit.solve('c')
 
-    def estampa(self, matriz: np.ndarray) -> None:
-        matriz[self.negativo, self.negativo] += 1/self.resistencia
-        matriz[self.positivo, self.negativo] -= 1/self.resistencia
-        matriz[self.negativo, self.positivo] -= 1/self.resistencia
-        matriz[self.positivo, self.positivo] += 1/self.resistencia
-
-class Circuito:
-
-    def __init__(self) -> None:
-        self.matriz: np.ndarray
-        self.componentes: typing.List[Componente]
-        self.numero_de_nos: int
-        self.voltagens: typing.List[complex]
-
-    def add_componente(componente: Componente) -> None:
-        pass
-
-    def remove_componente(id: int) -> None:
-        pass
-
-    def solve(terra: int) -> None:
-        pass
-
-    def componente_info(id: int) -> pd.Series:
-        pass
-
-    def transfer_function(entrada: typing.Tuple[int, int], 
-                        saída: typing.Tuple[int, int]) \
-                        -> typing.Callable[[complex], complex]:
-        pass
+    f = circuit.transfer_function('c', (1, "Current"), (3, "Voltage"))
+    f.plot_laplace()
+    f.plot_bode()
