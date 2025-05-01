@@ -8,10 +8,12 @@ if __name__ == "__main__":
     circuit = Circuit()
 
     components = [
-        Component.Resistor('a', 'b', 1),
-        Component.CurrentFont('a', 'c', 10),
-        Component.Transconductor('c', 'b', 'a', 'b', 3),
-        Component.Resistor('b', 'c', 2)
+        Component.CurrentFont('a', 'b', 1),
+        Component.Inductor('a', 'b', 2),
+        Component.Capacitor('a', 'c', 2),
+        Component.Resistor('c', 'b', 5),
+        Component.VoltageFontControledByCurrent('c', 'd', 'b', 'c', 2),
+        Component.Resistor('d', 'b', 3)
     ]
 
     for component in components:
@@ -19,6 +21,6 @@ if __name__ == "__main__":
 
     # circuit.solve('c')
 
-    f = circuit.transfer_function('c', (1, "Current"), (3, "Voltage"))
+    f = circuit.transfer_function('b', (4, "Current"), (0, "Current"))
     f.plot_laplace()
     f.plot_bode()

@@ -44,7 +44,7 @@ class Circuit:
         self.components.append(component)
         self.check_terminals(component)
 
-    def solve(self, earth: str) -> None:
+    def solve(self, earth: str, sweep: complex = None) -> None:
 
         self.voltages: np.ndarray = np.zeros(shape=(0, 1))
 
@@ -65,7 +65,9 @@ class Circuit:
 
             self.check_terminals(active_component)
             active_component.stamp(self.matrix, self.currents, self.terminals)
-            s = active_component.s
+            if sweep: s = sweep
+            else: s = active_component.s
+
             for passive_component in self.passive_components:
                 self.check_terminals(passive_component)
                 passive_component.set_s(s)
@@ -112,7 +114,7 @@ class Circuit:
                         for values_list in values:
                             for s in values_list:
                                 self.components[input[0]].set_s(s)
-                                self.solve(earth)
+                                self.solve(earth, s)
 
                                 input_component_info = self.component_info(input[0])[input[1]]
                                 output_component_info = self.component_info(output[0])[output[1]]
@@ -123,7 +125,7 @@ class Circuit:
                         answer = []
                         for s in values:
                             self.components[input[0]].set_s(s)
-                            self.solve(earth)
+                            self.solve(earth, s)
 
                             input_component_info = self.component_info(input[0])[input[1]]
                             output_component_info = self.component_info(output[0])[output[1]]
@@ -132,7 +134,7 @@ class Circuit:
                         return answer
                 elif type(values) == complex:
                     self.components[input[0]].set_s(s)
-                    self.solve(earth)
+                    self.solve(earth, s)
 
                     input_component_info = self.component_info(input[0])[input[1]]
                     output_component_info = self.component_info(output[0])[output[1]]

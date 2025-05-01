@@ -16,11 +16,11 @@ class ComplexFunction(abc.ABC):
 
     @staticmethod
     def module(s: complex) -> complex:
-        return abs(s)
+        return np.abs(s)
 
     @staticmethod
     def phase(s: complex) -> complex:
-        return np.arctan(s.imag / s.real)
+        return np.angle(s)
 
     def plot_bode(self, cut: float=0.0) -> None:
         freq = np.linspace(self.imag_range[0], self.imag_range[1], self.resolution)
