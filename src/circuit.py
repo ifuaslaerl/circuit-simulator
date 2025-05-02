@@ -3,7 +3,7 @@ import typing
 import numpy as np
 import pandas as pd
 
-from src.component import Component
+import src.component as Component
 from src.grafical import ComplexFunction
 
 class Circuit:
@@ -15,9 +15,9 @@ class Circuit:
         self.voltages: np.ndarray = np.zeros(shape=(0, 1), dtype=complex)
         self.currents: np.ndarray = np.zeros(shape=(0, 1), dtype=complex)
 
-        self.components: typing.List[Component] = []
-        self.active_components: typing.List[Component] = []
-        self.passive_components: typing.List[Component] = []
+        self.components: typing.Dict[str, Component.Component] = dict()
+        self.active_components: typing.List[Component.Component] = []
+        self.passive_components: typing.List[Component.Component] = []
         self.terminals: typing.Dict[str, int] = dict()
         self.real_terminals: typing.Dict[str, int] = dict()
 
@@ -26,7 +26,7 @@ class Circuit:
     def read_netlist(self, path: str) -> str:
         pass
 
-    def check_terminals(self, component: Component):
+    def check_terminals(self, component: Component.Component):
         for terminal in component.terminals:
             if not terminal in self.terminals:
                 self.terminals[terminal] = self.temp_n
@@ -40,18 +40,19 @@ class Circuit:
                 self.n += 1
                 self.voltages = np.pad(self.voltages, ((0, 1), (0, 0)), "constant")
 
-    def add_component(self, component: Component) -> None:
-        self.components.append(component)
+    def add_component(self, component: Component.Component) -> None:
+        self.components[component.name] = component
         self.check_terminals(component)
 
     def solve(self, earth: str, sweep: complex = None) -> None:
 
         self.voltages: np.ndarray = np.zeros(shape=(0, 1))
 
-        self.active_components: typing.List[Component] = []
-        self.passive_components: typing.List[Component] = []
+        self.active_components: typing.List[Component.Component] = []
+        self.passive_components: typing.List[Component.Component] = []
 
-        for component in self.components:
+        for name in self.components:
+            component = self.components[name]
             if component.active:
                 self.active_components.append(component)
             else:
@@ -87,20 +88,22 @@ class Circuit:
             for key in self.terminals:
                 self.voltages[self.real_terminals[key]] += voltages[self.terminals[key]]
 
-    def component_info(self, id: int) -> pd.Series:
-        info: pd.Series = pd.Series(index = ["Voltage", "Current", "Power"], dtype=complex)
-        info["Voltage"] = self.components[id].voltage(self.terminals, self.voltages)
-        info["Current"] = self.components[id].current(self.terminals, self.voltages)
+    def component_info(self, name: str) -> pd.Series:
+        assert name in self.components
+        info: pd.Series = pd.Series(index = ["Name", "Voltage", "Current", "Power"], dtype=object)
+        info["Name"] = self.components[name].name
+        info["Voltage"] = self.components[name].voltage(self.terminals, self.voltages)
+        info["Current"] = self.components[name].current(self.terminals, self.voltages)
         info["Power"] = info["Voltage"]*info["Current"]
         return info
 
     def transfer_function(self, earth: str,
-                        input: typing.Tuple[int, str], 
-                        output: typing.Tuple[int, str]) \
+                        input: typing.Tuple[str, str], 
+                        output: typing.Tuple[str, str]) \
                         -> ComplexFunction:
 
-        assert input[0] <= self.n
-        assert output[0] <= self.n
+        assert input[0] in self.components
+        assert output[0] in self.components
 
         assert input[1] in ["Voltage", "Current", "Power"]
         assert output[1] in ["Voltage", "Current", "Power"]
@@ -141,3 +144,16 @@ class Circuit:
                     return output_component_info/input_component_info
 
         return function()
+
+    def table(self, components: typing.List[str] = None) -> pd.DataFrame:
+        series = []
+
+        if not components: components = self.components.keys()
+
+        for component_name in components:
+            series.append(self.component_info(component_name))
+
+        return pd.concat(series, axis=1).T
+
+if __name__ == "__main__":
+    pass

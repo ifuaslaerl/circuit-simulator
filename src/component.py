@@ -8,7 +8,8 @@ K: int = 3
 
 class Component:
 
-    def __init__(self, terminals: typing.List[str]) -> None:
+    def __init__(self, terminals: typing.List[str], name: str) -> None:
+        self.name = name
         self.terminals: typing.List[str] = terminals
         self.s: complex = 0
         self.active: bool = False
@@ -30,9 +31,9 @@ class Component:
 
 class Resistor(Component):
 
-    def __init__(self, positive: str, negative: str, resistence: float) -> None:
+    def __init__(self, name: str, positive: str, negative: str, resistence: float) -> None:
         self.x: str = 'i'.join(random.choices(string.digits, k=K))
-        super().__init__([positive, negative, self.x])
+        super().__init__([positive, negative, self.x], name)
         self.positive: str = positive
         self.negative: str = negative
         self.resistence: float = resistence
@@ -52,8 +53,8 @@ class Resistor(Component):
 
 class CurrentFontControledByVoltage(Component):
 
-    def __init__(self, positive: str, negative: str, positive_control: str, negative_control: str, transconductance: complex) -> None:
-        super().__init__([positive, negative, positive_control, negative_control])
+    def __init__(self, name: str, positive: str, negative: str, positive_control: str, negative_control: str, transconductance: complex) -> None:
+        super().__init__([positive, negative, positive_control, negative_control], name)
         self.positive: str = positive
         self.negative: str = negative
         self.positive_control: str = positive_control
@@ -74,8 +75,8 @@ class CurrentFontControledByVoltage(Component):
 
 class CurrentFont(Component):
 
-    def __init__(self, positive: str, negative: str, current_value: complex) -> None:
-        super().__init__([positive, negative])
+    def __init__(self, name: str, positive: str, negative: str, current_value: complex) -> None:
+        super().__init__([positive, negative], name)
         self.positive: str = positive
         self.negative: str = negative
         self.s: complex = current_value
@@ -93,8 +94,8 @@ class CurrentFont(Component):
 
 class Capacitor(Component):
 
-    def __init__(self, positive: str, negative: str, capacitance: float, initial_voltage: float = 0) -> None:
-        super().__init__([positive, negative])
+    def __init__(self, name: str, positive: str, negative: str, capacitance: float, initial_voltage: float = 0) -> None:
+        super().__init__([positive, negative], name)
         self.positive: str = positive
         self.negative: str = negative
         self.capacitance: float = capacitance
@@ -117,9 +118,9 @@ class Capacitor(Component):
 
 class Inductor(Component):
     
-    def __init__(self, positive: str, negative: str, indutance: float, initial_current: float = 0) -> None:
+    def __init__(self, name: str, positive: str, negative: str, indutance: float, initial_current: float = 0) -> None:
         self.x: str = 'i'.join(random.choices(string.digits, k=K))
-        super().__init__([positive, negative, self.x])
+        super().__init__([positive, negative, self.x], name)
         self.positive: str = positive
         self.negative: str = negative
         self.indutance: float = indutance
@@ -142,10 +143,10 @@ class Inductor(Component):
 
 class Transformer(Component):
 
-    def __init__(self, inductor1: Inductor, inductor2: Inductor, m: float) -> None:
+    def __init__(self, name: str, inductor1: Inductor, inductor2: Inductor, m: float) -> None:
         self.x: str = 'i'.join(random.choices(string.digits, k=K))
         self.y: str = 'i'.join(random.choices(string.digits, k=K))
-        super().__init__(inductor1.terminals + inductor2.terminals + (self.x, self.y))
+        super().__init__(inductor1.terminals + inductor2.terminals + (self.x, self.y), name)
         self.inductor1: Inductor = inductor1
         self.inductor2: Inductor = inductor2
         self.m: float = m
@@ -177,9 +178,9 @@ class Transformer(Component):
 
 class VoltageFont(Component):
 
-    def __init__(self, positive: str, negative: str, voltage_value: complex) -> None:
+    def __init__(self, name: str, positive: str, negative: str, voltage_value: complex) -> None:
         x: str = 'i'.join(random.choices(string.digits, k=K))
-        super().__init__([positive, negative, x])
+        super().__init__([positive, negative, x], name)
         self.positive: str = positive
         self.negative: str = negative
         self.x: str = x 
@@ -202,9 +203,9 @@ class VoltageFont(Component):
 
 class VoltageFontControledByVoltage(Component):
 
-    def __init__(self, positive: str, negative: str, positive_control: str, negative_control: str, amplification: complex):
+    def __init__(self, name: str, positive: str, negative: str, positive_control: str, negative_control: str, amplification: complex):
         self.x: str = 'i'.join(random.choices(string.digits, k=K))
-        super().__init__([positive, negative, positive_control, negative_control, self.x])
+        super().__init__([positive, negative, positive_control, negative_control, self.x], name)
         self.positive: str = positive
         self.negative: str = negative
         self.positive_control: str = positive_control
@@ -227,9 +228,9 @@ class VoltageFontControledByVoltage(Component):
 
 class CurrentFontControledByCurrent(Component):
 
-    def __init__(self, positive: str, negative: str, positive_control: str, negative_control: str, amplification: complex):
+    def __init__(self, name: str, positive: str, negative: str, positive_control: str, negative_control: str, amplification: complex):
         self.x: str = 'i'.join(random.choices(string.digits, k=K))
-        super().__init__([positive, negative, positive_control, negative_control, self.x])
+        super().__init__([positive, negative, positive_control, negative_control, self.x], name)
         self.positive: str = positive
         self.negative: str = negative
         self.positive_control: str = positive_control
@@ -252,10 +253,10 @@ class CurrentFontControledByCurrent(Component):
 
 class VoltageFontControledByCurrent(Component):
 
-    def __init__(self, positive: str, negative: str, positive_control: str, negative_control: str, amplification: complex):
+    def __init__(self, name: str, positive: str, negative: str, positive_control: str, negative_control: str, amplification: complex):
         self.x: str = 'i'.join(random.choices(string.digits, k=K))
         self.y: str = 'i'.join(random.choices(string.digits, k=K))
-        super().__init__([positive, negative, positive_control, negative_control, self.x, self.y])
+        super().__init__([positive, negative, positive_control, negative_control, self.x, self.y], name)
         self.positive: str = positive
         self.negative: str = negative
         self.positive_control: str = positive_control

@@ -69,3 +69,13 @@ class ComplexFunction(abc.ABC):
         ax.set_zlabel("Module")
 
         plt.show()
+
+if __name__ == "__main__":
+    class F(ComplexFunction):
+        @staticmethod
+        def f(s: complex) -> complex:
+            return (s + 2*s**-1)/(220*s**2 + 10*s + 480 -38*s**-1 + 80*s**-2)
+
+    f = F()
+    f.plot_laplace()
+    f.plot_bode()
