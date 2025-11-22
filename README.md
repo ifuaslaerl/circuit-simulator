@@ -9,9 +9,9 @@ A Python-based linear circuit simulator utilizing Modified Nodal Analysis (MNA) 
 
 ## Installation
 
-# ```bash
-# pip install .
-# ```
+```bash
+pip install .
+```
 
 ## Usage
 
